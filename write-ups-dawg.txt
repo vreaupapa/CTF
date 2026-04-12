@@ -1,22 +1,22 @@
 OSint
 
-Дмитрий-шесть:
+Challenge: Дмитрий-шесть
 Objective: Find a subway station based on 3 photos
-I google reversed the image online. After that, i found a website called wikimedia.org with one of the images.
+Solution: I google reversed the image online. After that, i found a website called wikimedia.org with one of the images.
 There, it said that the location of the photo is called 'METRO-2'
 
 flag: DawgCTF{Metro-2}
 
-Andy Martin:(Hard)
-Objective: Find a guy named Andy Martin, other than the singer, and where he dined on 12th July 2018, based on these informations:
+Challenge: Andy Martin
+Objective: Find a guy named Andy Martin, other than the singer, and figure out where he dined on 12th July 2018, based on these informations:
 He is a Londoner
 Visited Portugal and Mauritania
 There is an unorthodox way of keeping track of this trips
 
 
-After some online deep search, I found a popular account with the username 'Andy Martin' on google maps local guides website.(https://www.localguides-ranking.com/profile/7005/)
+Solution: After some online deep search, I found a popular account with the username 'Andy Martin' on google maps local guides website.(https://www.localguides-ranking.com/profile/7005/)
 There, I found that he travelled to Portugal and Mauritania and most of his reviews were from London. 
-It was hard to identify the exact restaurant he dined on 12th July 2018 also given that it only said (x years ago, not the exact date).
+It was hard to identify the exact restaurant where he dined on 12th July 2018 also given that it only said 'x years ago', not the exact date.
 To find it, I opened his account on the mobile app where you can filter the reviews and after that it was clear what the flag was.
 
 flag: Poppies Fish & Chips
@@ -114,7 +114,7 @@ MISC
 Challenge: ZAP1
 Objective: Identify the model of an Insulator we had 3 photos of
 
-I found a website called allinsulators.com where they had photos of every documented and officially named insulator.
+Solution: I found a website called allinsulators.com where they had photos of every documented and officially named insulator.
 We knew from the challenge's statement that our insulator was a Suspension Type and had a diameter equal to 10inches so it was obvious that our model can be found in ST-4500-4749 interval.
 In one of the photos of our insulator, it can be read that it was produced by LOCKE(USA). On the website there were only 4 insulators made by this producer and based on the skirt's pattern, i could identify the correct Insulator.
 
@@ -123,7 +123,7 @@ flag: DawgCTF{ST-4626F}
 Challenge: ZAP2
 Objective: Now that we had the right model, we needed to identify the right type.
 
-On the very same website, it can be found that the naming convention for these insulators is as follows: 
+Solution: On the very same website, it can be found that the naming convention for these insulators is as follows: 
 xxAyyy where 
 xx - the Combined M&E Strength
 A - initial of it's category
@@ -135,7 +135,7 @@ flag: DawgCTF{20S840}
 Challenge: Beeps and Boops
 Objective: Decode a .wav file and use cryptography to get the right flag
 
-Solution: Used a converter to get a .midi file from the .wav one. Given that we had a file where every note had a associated letter, I could build a code:
+Solution: Used a converter to get a .midi file from the .wav one. Given that we had a file where every note had an associated letter, I could build a code:
 Pv8vO^R;ZDz^FzPCvPFMO0CXYvvTDzF but it didn't make any sense.
 If we went down an octave for every note, we got the following code:
 DjwjCTF{N1nT3nD0mjD3ACo0LMjjH1n3} which almost seems like a flag but we could clearly see that instaed of DawgCTF we had djwjCTF and there were also some j's between brackets so it was clear that j could be replaced by any letter.
