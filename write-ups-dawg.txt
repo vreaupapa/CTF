@@ -1,0 +1,144 @@
+OSint
+
+Дмитрий-шесть:
+Objective: Find a subway station based on 3 photos
+I google reversed the image online. After that, i found a website called wikimedia.org with one of the images.
+There, it said that the location of the photo is called 'METRO-2'
+
+flag: DawgCTF{Metro-2}
+
+Andy Martin:(Hard)
+Objective: Find a guy named Andy Martin, other than the singer, and where he dined on 12th July 2018, based on these informations:
+He is a Londoner
+Visited Portugal and Mauritania
+There is an unorthodox way of keeping track of this trips
+
+
+After some online deep search, I found a popular account with the username 'Andy Martin' on google maps local guides website.(https://www.localguides-ranking.com/profile/7005/)
+There, I found that he travelled to Portugal and Mauritania and most of his reviews were from London. 
+It was hard to identify the exact restaurant he dined on 12th July 2018 also given that it only said (x years ago, not the exact date).
+To find it, I opened his account on the mobile app where you can filter the reviews and after that it was clear what the flag was.
+
+flag: Poppies Fish & Chips
+
+Protocol Analysis
+
+Challenge 1 & 2: Proxy Basics
+Objective: Intercept and relay messages between two parties.
+Concept: Clear-text Communication & Relay Attacks.
+
+In these introductory levels, the protocol communicated in clear text using a specific format: t: for text, n: for name, and d: for data.
+
+Vulnerability: The protocol lacked any form of authentication or encryption.
+
+Solution: By requesting a message from Alice, we received a standard greeting. Sending this exact payload to Bob allowed us to impersonate the flow and receive the flag.
+
+Takeaway: Clear-text protocols are vulnerable to eavesdropping and simple replay attacks.
+
+The 2 flags are: DawgCTF{PR0T0C0LS_R_3ZPZ}, DawgCTF{CH4NG3_0F_PL4N5}
+
+
+
+Challenge 3: Missing Alice
+Objective: Manually craft a protocol-compliant message.
+Concept: Manual Packet Crafting.
+
+Alice was removed from the scenario, forcing us to communicate with Bob directly.
+
+Vulnerability: Bob only validated the content of the message against a hardcoded script, not the source of the message.
+
+Solution: Following the manual’s script, we manually constructed the payload:
+"t:Hello|n:bob|t: this is|n:alice|t: give me the flag"
+
+Takeaway: Protocol strictness (like exact spacing and case sensitivity) is crucial when manually interacting with a backend API via curl
+
+flag: DawgCTF{N0_0N3_3LS3_H0M3}
+
+
+
+Challenge 4: Real Security!
+Objective: Intercept symmetric keys to decrypt traffic.
+Concept: Improper Key Exchange (Symmetric Encryption).
+
+Vulnerability: While the data was encrypted, the secret key (k) and the nonce (d) were transmitted in the clear by Alice.
+
+Solution: 1.  Intercepted Alice's message to get the key (k) and the first nonce (d1).
+2.  Intercepted Bob's response to get the encrypted flag (d2).
+3.  Used the /util/sym_decrypt utility to combine these values and reveal the flag.
+
+Takeaway: Symmetric encryption is only as secure as the key exchange mechanism. Sending keys over the same channel as the encrypted data defeats the purpose of encryption.
+
+flag: DawgCTF{N0T_S0_S3CR3T_K3Y}
+
+
+Challenge 5: Is This Real?
+Objective: Perform a Man-in-the-Middle (MitM) attack on asymmetric encryption.
+Concept: Public Key Replacement Attack.
+
+Vulnerability: The protocol used public keys but lacked a way to verify if a public key actually belonged to the sender (no Certificate Authority/Web of Trust).
+
+Solution: 1.  Generated a custom key pair (pub_X, priv_X).
+2.  Intercepted Alice's public key but sent our own pub_X to Bob instead.
+3.  Bob, thinking he was talking to Alice, encrypted the flag using our public key.
+4.  We decrypted Bob's response using our corresponding priv_X.
+
+Takeaway: Asymmetric encryption requires a Public Key Infrastructure (PKI) to prevent attackers from substituting keys.
+
+flag: DawgCTF{C3RT1F13D_1NS3CUR3}
+	
+
+
+
+Challenge 9: Oracle
+Objective: Exploit a Re-encryption Oracle to bypass nested encryption.
+Concept: Decryption Oracle Attack / Padding Oracle Logic.
+
+Vulnerability: Alice acted as an "Oracle." If sent a message encrypted with her key, she would decrypt it and, if it contained a specific destination name (X), she would re-encrypt the inner content for that person.
+
+The "Double Oracle" Strategy:
+
+1.Preparation: Generated a personal certificate (cert_X) to establish a valid identity.
+2.Initial Interception: Captured Bob's payload intended for Alice.
+3.The Oracle Request: Since Alice required the destination name to be inside the encrypted packet, we used the /asym_encrypt utility to wrap Bob's data and our name (ionut) into a new package encrypted for Alice.
+4.The Relay: Sent this "Oracle Package" to Alice. She decrypted her layer, saw it was destined for "ionut," and sent it back to us encrypted with our own key.
+5.Final Decryption: Because the flag was nested, we repeated the process or used our private key to strip the final layer, validating the original content from Bob.
+
+Takeaway: A participant that decrypts and re-sends data (even if encrypted for a new recipient) can be used as a tool to bypass security layers they were meant to protect
+
+flag: DawgCTF{ST4R3_1NTO_TH3_VO1D}
+
+
+
+MISC
+
+Challenge: ZAP1
+Objective: Identify the model of an Insulator we had 3 photos of
+
+I found a website called allinsulators.com where they had photos of every documented and officially named insulator.
+We knew from the challenge's statement that our insulator was a Suspension Type and had a diameter equal to 10inches so it was obvious that our model can be found in ST-4500-4749 interval.
+In one of the photos of our insulator, it can be read that it was produced by LOCKE(USA). On the website there were only 4 insulators made by this producer and based on the skirt's pattern, i could identify the correct Insulator.
+
+flag: DawgCTF{ST-4626F}
+
+Challenge: ZAP2
+Objective: Now that we had the right model, we needed to identify the right type.
+
+On the very same website, it can be found that the naming convention for these insulators is as follows: 
+xxAyyy where 
+xx - the Combined M&E Strength
+A - initial of it's category
+yyy - last 3 digits of it's model
+We already knew that it's category is Suspension and the other 2 could be found in the given photos(20000lbs and the model is 1840)
+
+flag: DawgCTF{20S840}
+
+Challenge: Beeps and Boops
+Objective: Decode a .wav file and use cryptography to get the right flag
+
+Solution: Used a converter to get a .midi file from the .wav one. Given that we had a file where every note had a associated letter, I could build a code:
+Pv8vO^R;ZDz^FzPCvPFMO0CXYvvTDzF but it didn't make any sense.
+If we went down an octave for every note, we got the following code:
+DjwjCTF{N1nT3nD0mjD3ACo0LMjjH1n3} which almost seems like a flag but we could clearly see that instaed of DawgCTF we had djwjCTF and there were also some j's between brackets so it was clear that j could be replaced by any letter.
+Doing this we got the correct flag.
+
+flag: DawgCTF{N1nT3nD0MaD3ACo0LMacH1n3}
