@@ -1,0 +1,62 @@
+Write-ups Zeroday TM
+
+CRYPTO
+
+1.aveam codul hex urmator: 392b322b1e3d2c3d392a2a2a283c39352624312623343a312b2e28392c313c26351b si trebuia sa scoatem flagul care stiam ca are formatul zdtm{string}
+abordare: Știm că flag-ul începe cu zdtm{. Asta ne oferă 5 bytes de plaintext cunoscut, ceea ce este suficient pentru a deduce primii 5 bytes ai cheii. Am aplicat urmatorul cod in python:
+ct = bytes.fromhex("392b322b1e3d2c3d392a2a2a283c39352624312623343a312b2e28392c313c26351b")
+prefix = b'zdtm{'
+
+key_bytes = bytes([ct[i] ^ prefix[i] for i in range(len(prefix))])
+# Rezultat: b'COFFe'
+
+De aici ne putem da seama ca este vorba de cuvantul 'coffee' ca si key pentru a face xor intre acesta si codul hex si ne da imediat flagul:
+ZDTM{XOR_LOOKS_SCARIER_THAN_IT_IS}
+
+2.aici aveam urmatorul enunt si mesaj criptat:
+The archivist thought he learned from his previous mistake. Did hex?
+
+576b525554587446546b4e5052456c4f5231394a5531394f5431526652553544556c6c5156456c50546e303d
+
+abordare: din enunt este destul de clar ca trebuie sa folosim ceva legat de hex si anume hexdump de unde obtinem urmatorul cod:
+WkRUTXtFTkNPRElOR19JU19OT1RfRU5DUllQVElPTn0=
+datorita acelui egal de la final ne dam seama ca e vorba de o alta criptare in base64 care ne da rezultatul chiar flagul cerut:
+zdtm{ENCODING_IS_NOT_ENCRYPTION}
+
+3.Pentru al treilea challenge am avut 4 strofe din 'Luceafarul' de Mihai Eminescu si urmatorul cod:
+KXVQ{RJTVNL_AYPXRZ_CZICMU_CVDJLVHPLMEE}
+
+abordare:Dupa ce am incercat diferite metode prin care sa pot asocia versurile poeziei cu flagul, am ajuns la concluzia ca este vorba de cifrul lui vigenere deoarece are ca si metoda de decriptare cunoasterea unei chei iar in cazul nostru era destul de logic ca aceasta este 'LUCEAFARUL'. Dupa decriptare obtinem flagul:
+ZDTM{RETETA_PENTRU_CIORBA_ARDELENEASCA}
+
+4.Pentru al patrulea, am avut urmatorul enunt:
+The archivist finally embraced modern cryptography.
+â€œClassical ciphers are toys, small ones.â€ he wrote.
+
+n = 9408759790383105133161103283826984827528801769314347714547601915589546181131310708353405753091496859205091371436900900073486088639260461160646631812396469191626982296459097662217285121344426946437706688765214301460605941543495147614538135179544829052420146985668806196559606619586945914030818145149242966368601218719771454948665607889306922955823737265010862549
+c = 567886008628582614176675620746647119465913033360839517687380864877007072129989292654535142001555437419581434044085652122402650313910654692956127217631833360125025628559064580874755354513570531922546942280774567523237772780062859047730901058285040490649449603255699250100384409113828519700779759650108805781802193138736539749
+
+abordare:Din enunt am realizat ca este vorba de una dintre criptarile moderne de pe site ul 'dcode' printre care se afla si cifrul RSA avand exact campurile cerute C si N de unde am scos flagul:
+ZDTM{FAST_ENCRYPTION_CAN_BE_A_VERY_SLOW_IDEA}
+
+FORENSIC
+
+1.BREAKING-ZIP
+aici ni se oferea un zip fiind securizat cu o parola.
+
+abordare: Desi zip ul era parolat, numele fisierlor erau vizibile si din ce se vedea era vorba de o extensie de browser cu o mica pisica care iti urmareste cursorul. Am cautat pe net sa vad daca reusesc sa gasesc un git repo cu extensia respectiva gasind unul. Am downloadat unul dintre fisiere pentru a vedea daca ii corespunde dimensiunea cu cea din zip ul criptat primind un raspuns pozitiv ceea ce inseamna ca puteam sa folosesc toolul 'bkcrack' care, daca am un fisier identic cu unul dintre cele parolate(toate avand aceeasi parola) imi va da 3 chei interne. Am folosit comanda
+bkcrack -C breaking_zip.zip -c oneko.js/LICENSE -p licenta_originala.txt
+obtinand cheile '3dd23cd8 5731ba17 597599a4' si mai departe am folosit comanda
+bkcrack -C breaking_zip.zip -k 3dd23cd8 5731ba17 597599a4 -U new_archive.zip password
+pentru a schimba parola zipului in 'password'
+mai departe i am dat unzip si am obtinut flagul:
+ZDTM{ZipCrypto_security_is_a_lie_6c6f6c}
+
+
+NETWORK
+
+1.Am primit un fisier de tip pcap
+
+abordare: l am deschis folosind wireshark unde am putut observa cateva pachete de tip http despre rate si alte informatii la intamplare printre care se aflau si cateva imagini. Le-am extras iar una dintre poze mergea deschisa insa nu parea sa fie nimic important. Am folosit exiftool pentru a vedea daca gasesc ceva mesaje ascunse, chestie care a adus si succesul challenge ului deoarece la comentarii era urmatorul mesaj:WkRUTXtXb28wMHd3d19zQEBvX2thd2ExMTExISEhLXVmeWhoM2hkVUBoZ2R9 care rezulta chiar in flagul nostru folosind decriptarea prin base64:
+ZDTM{Woo00www_s@@o_kawa1111!!!-ufyhh3hdU@hgd} (wow so kawaii :3)
+
